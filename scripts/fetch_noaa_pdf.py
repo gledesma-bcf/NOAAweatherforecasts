@@ -33,7 +33,7 @@ try:
         for i, location in enumerate(urls, 1):
             location_name = location["name"]
             url = location["url"]
-            output_file = os.path.join(output_folder, f"weather_forecast_{location_name}.pdf")
+            output_file = os.path.join(output_folder, f"Weather Forecast {location_name} {now_pacific}.pdf")
             
             try:
                 page = browser.new_page()
