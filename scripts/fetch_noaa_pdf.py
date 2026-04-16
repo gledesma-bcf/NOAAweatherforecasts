@@ -1,6 +1,7 @@
 from playwright.sync_api import sync_playwright
 from datetime import datetime
 import os
+import pytz
 
 # Add all your NOAA weather URLs with custom names here
 urls = [
@@ -16,13 +17,15 @@ urls = [
 ]
 
 try:
-    print(f"[{datetime.now()}] Starting NOAA weather PDF generation...")
+    # Get current time in Pacific timezone
+    pacific = pytz.timezone('US/Pacific')
+    now_pacific = datetime.now(pacific).strftime("%Y-%m-%d_%H%M")
+    print(f"[{datetime.now(pacific)}] Starting NOAA weather PDF generation...")
     
-    # Create folder with today's date and time
-    now = datetime.now().strftime("%Y-%m-%d_%H%M")
-    output_folder = f"weather_forecasts_{now}"
+    # Create folder with today's date and time (Pacific)
+    output_folder = f"weather_forecasts_{now_pacific}"
     os.makedirs(output_folder, exist_ok=True)
-    print(f"[{datetime.now()}] Created folder: {output_folder}")
+    print(f"[{datetime.now(pacific)}] Created folder: {output_folder}")
     
     with sync_playwright() as p:
         browser = p.chromium.launch()
@@ -35,10 +38,10 @@ try:
             try:
                 page = browser.new_page()
                 
-                print(f"[{datetime.now()}] Fetching webpage {i}/{len(urls)}: {location_name}")
+                print(f"[{datetime.now(pacific)}] Fetching webpage {i}/{len(urls)}: {location_name}")
                 page.goto(url, wait_until="networkidle")
                 
-                print(f"[{datetime.now()}] Converting to PDF (landscape)...")
+                print(f"[{datetime.now(pacific)}] Converting to PDF (landscape)...")
                 page.pdf(
                     path=output_file,
                     landscape=True
@@ -48,16 +51,16 @@ try:
                 # Verify file was created
                 if os.path.exists(output_file):
                     file_size = os.path.getsize(output_file)
-                    print(f"[{datetime.now()}] ✓ PDF saved: {output_file} ({file_size} bytes)")
+                    print(f"[{datetime.now(pacific)}] ✓ PDF saved: {output_file} ({file_size} bytes)")
                 else:
                     raise Exception(f"PDF file {output_file} was not created")
                     
             except Exception as e:
-                print(f"[{datetime.now()}] ✗ Error processing {location_name}: {str(e)}")
+                print(f"[{datetime.now(pacific)}] ✗ Error processing {location_name}: {str(e)}")
         
         browser.close()
-        print(f"[{datetime.now()}] ✓ All PDFs generated successfully!")
+        print(f"[{datetime.now(pacific)}] ✓ All PDFs generated successfully!")
         
 except Exception as e:
-    print(f"[{datetime.now()}] ✗ Fatal error: {str(e)}")
+    print(f"[{datetime.now(pacific)}] ✗ Fatal error: {str(e)}")
     raise

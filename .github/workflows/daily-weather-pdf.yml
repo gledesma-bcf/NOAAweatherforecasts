@@ -26,7 +26,9 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install playwright
+        pip install pytz
         playwright install chromium
+
 
     - name: Fetch NOAA PDFs
       run: python scripts/fetch_noaa_pdf.py
