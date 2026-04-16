@@ -51,7 +51,7 @@ jobs:
         Date: ${{ env.RELEASE_DATE }}
         files: |
           weather_forecasts_${{ env.RELEASE_DATE }}.zip
-          weather_forecasts_*/**/*.pdf
+          ##weather_forecasts_*/**/*.pdf
 
 
     - name: Upload all PDFs as artifacts
