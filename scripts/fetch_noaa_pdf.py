@@ -4,12 +4,12 @@ import os
 
 # Add all your NOAA weather URLs with custom names here
 urls = [
-    {"name": "Fresno Airport", "url": "https://www.weather.gov/wrh/print?lat=36.769&lon=-119.7178"},
-    {"name": "CSU Fresno", "url": "https://www.weather.gov/wrh/print?lat=36.8092&lon=-119.7530"},
-    {"name": "COS Visalia", "url": "https://www.weather.gov/wrh/print?lat=36.3217&lon=-119.3147"},
-    {"name": "Los Banos HS", "url": "https://www.weather.gov/wrh/print?lat=37.0509&lon=-120.8408"},
-    {"name": "Mendota USD Office", "url": "https://www.weather.gov/wrh/print?lat=36.7622&lon=-120.3885"},
-    {"name": "Justin Garza HS", "url": "https://www.weather.gov/wrh/print?lat=36.7986&lon=-119.9154"}
+    {"name": "Bakersfield", "url": "https://www.weather.gov/wrh/print?lat=36.769&lon=-119.7178"},
+    {"name": "Delano", "url": "https://www.weather.gov/wrh/print?lat=36.8092&lon=-119.7530"},
+    {"name": "Ridgecrest", "url": "https://www.weather.gov/wrh/print?lat=36.3217&lon=-119.3147"},
+    {"name": "Visalia", "url": "https://www.weather.gov/wrh/print?lat=37.0509&lon=-120.8408"},
+    {"name": "Porterville", "url": "https://www.weather.gov/wrh/print?lat=36.7622&lon=-120.3885"},
+    {"name": "Tehachapi", "url": "https://www.weather.gov/wrh/print?lat=36.7986&lon=-119.9154"}
     # Add more like this:
     # {"name": "Your Location", "url": "https://www.weather.gov/wrh/print?lat=37.000&lon=-120.000"},
 ]
@@ -31,8 +31,11 @@ try:
                 print(f"[{datetime.now()}] Fetching webpage {i}/{len(urls)}: {location_name}")
                 page.goto(url, wait_until="networkidle")
                 
-                print(f"[{datetime.now()}] Converting to PDF...")
-                page.pdf(path=output_file)
+                print(f"[{datetime.now()}] Converting to PDF (landscape)...")
+                page.pdf(
+                    path=output_file,
+                    landscape=True
+                )
                 page.close()
                 
                 # Verify file was created
