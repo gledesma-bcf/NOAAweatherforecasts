@@ -1,0 +1,40 @@
+name: Daily Weather PDF
+
+on:
+  schedule:
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+
+jobs:
+  fetch_weather:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install playwright
+        playwright install chromium
+
+    - name: Fetch NOAA PDF
+      run: python scripts/fetch_noaa_pdf.py
+
+    - name: Send email with PDF
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp.gmail.com
+        server_port: 465
+        username: ${{ secrets.EMAIL_USER }}
+        password: ${{ secrets.EMAIL_PASSWORD }}
+        subject: Daily NOAA Weather Forecast
+        to: ${{ secrets.EMAIL_RECIPIENT }}
+        from: GitHub Actions
+        attachments: weather_forecast.pdf
