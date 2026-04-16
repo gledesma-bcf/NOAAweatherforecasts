@@ -18,13 +18,19 @@ urls = [
 try:
     print(f"[{datetime.now()}] Starting NOAA weather PDF generation...")
     
+    # Create folder with today's date and time
+    now = datetime.now().strftime("%Y-%m-%d_%H%M")
+    output_folder = f"weather_forecasts_{now}"
+    os.makedirs(output_folder, exist_ok=True)
+    print(f"[{datetime.now()}] Created folder: {output_folder}")
+    
     with sync_playwright() as p:
         browser = p.chromium.launch()
         
         for i, location in enumerate(urls, 1):
             location_name = location["name"]
             url = location["url"]
-            output_file = f"weather_forecast_{location_name}.pdf"
+            output_file = os.path.join(output_folder, f"weather_forecast_{location_name}.pdf")
             
             try:
                 page = browser.new_page()
