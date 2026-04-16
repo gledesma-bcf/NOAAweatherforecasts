@@ -28,23 +28,23 @@ jobs:
         pip install playwright
         playwright install chromium
 
-    - name: Fetch NOAA PDF
+    - name: Fetch NOAA PDFs
       run: python scripts/fetch_noaa_pdf.py
 
-    - name: Upload PDF as artifact
+    - name: Upload all PDFs as artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: weather_forecast
-        path: weather_forecast.pdf
+        name: weather_forecasts
+        path: weather_forecast_*.pdf
         retention-days: 7
 
-    - name: Create GitHub Issue with PDF
+    - name: Create GitHub Issue with PDFs
       uses: actions/github-script@v7
       with:
         script: |
           const issue = await github.rest.issues.create({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            title: `Daily NOAA Weather Forecast - ${new Date().toLocaleDateString()}`,
-            body: `Your daily weather forecast has been generated. Download the PDF from the workflow artifacts.\n\n[View Workflow Run](${context.server_url}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`
+            title: `Daily NOAA Weather Forecasts - ${new Date().toLocaleDateString()}`,
+            body: `Your daily weather forecast PDFs have been generated. Download all PDFs from the workflow artifacts.\n\n[View Workflow Run](${context.server_url}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`
           });
