@@ -2,12 +2,11 @@ name: Daily Weather PDF
 
 on:
   schedule:
-    - cron: '0 7 * * *'
+    - cron: '0 13 * * *'
   workflow_dispatch:
 
 permissions:
-  issues: write
-  contents: read
+  contents: write
 
 jobs:
   fetch_weather:
@@ -25,13 +24,35 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install playwright
-        pip install pytz
+        pip install playwright pytz
         playwright install chromium
 
 
     - name: Fetch NOAA PDFs
       run: python scripts/fetch_noaa_pdf.py
+
+    - name: Set release date
+      run: echo "RELEASE_DATE=$(date -u +'%Y-%m-%d')" >> $GITHUB_ENV
+
+      
+    - name: Zip PDFs
+      run: |
+        zip -r weather_forecasts_${{ env.RELEASE_DATE }}.zip weather_forecasts_*/
+
+
+    - name: Create GitHub Release and Upload PDFs
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: weather-${{ env.RELEASE_DATE }}
+        name: Daily Weather Forecasts – ${{ env.RELEASE_DATE }}
+        body: |
+          NOAA daily weather forecast PDFs.
+
+        Date: ${{ env.RELEASE_DATE }}
+        files: |
+          weather_forecasts_${{ env.RELEASE_DATE }}.zip
+          weather_forecasts_*/**/*.pdf
+
 
     - name: Upload all PDFs as artifacts
       uses: actions/upload-artifact@v4
@@ -48,5 +69,5 @@ jobs:
             owner: context.repo.owner,
             repo: context.repo.repo,
             title: `Daily NOAA Weather Forecasts - ${new Date().toLocaleDateString()}`,
-            body: `Your daily weather forecast PDFs have been generated. Download all PDFs from the workflow artifacts.\n\n[View Workflow Run](${context.server_url}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`
+            body: `Your daily weather forecast PDFs have been generated. Go to **Artifacts** on this page to download them: ${context.server_url}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
           });
