@@ -33,3 +33,15 @@ jobs:
         name: weather_forecast
         path: weather_forecast.pdf
         retention-days: 7
+
+    - name: Create GitHub Issue with PDF
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const issue = await github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: `Daily NOAA Weather Forecast - ${new Date().toLocaleDateString()}`,
+            body: `Your daily weather forecast has been generated. Download the PDF from the workflow artifacts.\n\n[View Workflow Run](${context.server_url}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`
+          });
