@@ -27,14 +27,9 @@ jobs:
     - name: Fetch NOAA PDF
       run: python scripts/fetch_noaa_pdf.py
 
-    - name: Send email with PDF
-      uses: dawidd6/action-send-mail@v3
+    - name: Upload PDF as artifact
+      uses: actions/upload-artifact@v3
       with:
-        server_address: smtp.gmail.com
-        server_port: 465
-        username: ${{ secrets.EMAIL_USER }}
-        password: ${{ secrets.EMAIL_PASSWORD }}
-        subject: Daily NOAA Weather Forecast
-        to: ${{ secrets.EMAIL_RECIPIENT }}
-        from: GitHub Actions
-        attachments: weather_forecast.pdf
+        name: weather_forecast
+        path: weather_forecast.pdf
+        retention-days: 7
