@@ -9,7 +9,8 @@ urls = [
     {"name": "COS Visalia", "url": "https://www.weather.gov/wrh/print?lat=36.3217&lon=-119.3147"},
     {"name": "Los Banos HS", "url": "https://www.weather.gov/wrh/print?lat=37.0509&lon=-120.8408"},
     {"name": "Mendota USD Office", "url": "https://www.weather.gov/wrh/print?lat=36.7622&lon=-120.3885"},
-    {"name": "Justin Garza HS", "url": "https://www.weather.gov/wrh/print?lat=36.7986&lon=-119.9154"}
+    {"name": "Justin Garza HS", "url": "https://www.weather.gov/wrh/print?lat=36.7986&lon=-119.9154"},
+    {"name": "Fresno Airport Rain Gauge", "url": "https://forecast.weather.gov/data/obhistory/KFAT.html"}
     # Add more like this:
     # {"name": "Your Location", "url": "https://www.weather.gov/wrh/print?lat=37.000&lon=-120.000"},
 ]
