@@ -28,7 +28,7 @@ try:
     print(f"[{datetime.now(pacific)}] Created folder: {output_folder}")
     
     with sync_playwright() as p:
-        browser = p.chromium.launch()
+        browser = p.chromium.launch(channel='chrome')
         
         for i, location in enumerate(urls, 1):
             location_name = location["name"]

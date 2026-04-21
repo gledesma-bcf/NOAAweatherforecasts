@@ -1,8 +1,9 @@
+
 name: Daily Weather PDF
 
 on:
   schedule:
-    - cron: '0 11 * * *'
+    - cron: '0 11 * * *' # 11:00 UTC (~4 AM PDT)
   workflow_dispatch:
 
 permissions:
@@ -16,17 +17,31 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    # ---------- TIME TRACKING (START) ----------
+    - name: Record workflow start time
+      run: |
+        echo "START_UTC=$(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_ENV
+        echo "START_LOCAL=$(date +'%Y-%m-%d %H:%M:%S %Z')" >> $GITHUB_ENV
+    # -------------------------------------------
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.9'
 
+    # ---------- CACHE PIP (FAST) ----------
+    - name: Cache pip
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: pip-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
+    # ------------------------------------
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install playwright pytz
-        playwright install chromium
-
+        pip install -r requirements.txt
+      # NOTE: playwright install chromium REMOVED
 
     - name: Fetch NOAA PDFs
       run: python scripts/fetch_noaa_pdf.py
@@ -34,11 +49,16 @@ jobs:
     - name: Set release date
       run: echo "RELEASE_DATE=$(date -u +'%Y-%m-%d')" >> $GITHUB_ENV
 
-      
     - name: Zip PDFs
       run: |
         zip -r weather_forecasts_${{ env.RELEASE_DATE }}.zip weather_forecasts_*/
 
+    # ---------- TIME TRACKING (END) ----------
+    - name: Record workflow end time
+      run: |
+        echo "END_UTC=$(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_ENV
+        echo "END_LOCAL=$(date +'%Y-%m-%d %H:%M:%S %Z')" >> $GITHUB_ENV
+    # ---------------------------------------
 
     - name: Create GitHub Release and Upload PDFs
       uses: softprops/action-gh-release@v2
@@ -48,11 +68,16 @@ jobs:
         body: |
           NOAA daily weather forecast PDFs.
 
-        Date: ${{ env.RELEASE_DATE }}
+          Date: ${{ env.RELEASE_DATE }}
+
+          ⏱ Workflow timing:
+          - Start (UTC):   ${{ env.START_UTC }}
+          - End (UTC):     ${{ env.END_UTC }}
+          - Start (Local): ${{ env.START_LOCAL }}
+          - End (Local):   ${{ env.END_LOCAL }}
+
         files: |
           weather_forecasts_${{ env.RELEASE_DATE }}.zip
-          ##weather_forecasts_*/**/*.pdf
-
 
     - name: Upload all PDFs as artifacts
       uses: actions/upload-artifact@v4
@@ -60,5 +85,3 @@ jobs:
         name: weather_forecasts_${{ github.run_id }}
         path: weather_forecasts_*/
         retention-days: 7
-
-    
