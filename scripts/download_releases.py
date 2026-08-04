@@ -2,6 +2,8 @@
 import argparse
 import os
 import sys
+import zipfile
+from datetime import date
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -90,6 +92,19 @@ def download_release(release: dict, output_dir: Path, headers: dict[str, str]) -
     return downloaded
 
 
+def zip_output_dir(output_dir: Path, archive_name: str | None = None) -> Path:
+    archive_date = date.today().isoformat()
+    archive_name = archive_name or f"Weather Records_{archive_date}.zip"
+    archive_path = output_dir.parent / archive_name
+
+    with zipfile.ZipFile(archive_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        for file_path in sorted(output_dir.rglob("*")):
+            if file_path.is_file():
+                archive.write(file_path, file_path.relative_to(output_dir.parent))
+
+    return archive_path
+
+
 def main() -> int:
     args = parse_args()
     owner, repo = args.repo.split("/", 1)
@@ -118,6 +133,9 @@ def main() -> int:
             print(f"Downloaded {len(downloaded)} asset(s) for {release['tag_name']}")
         else:
             print(f"No assets found for {release['tag_name']}")
+
+    archive_path = zip_output_dir(output_dir)
+    print(f"Created archive: {archive_path}")
 
     return 0
 
